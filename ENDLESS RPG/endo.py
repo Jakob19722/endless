@@ -159,12 +159,11 @@ class Mob1(pygame.sprite.Sprite):
 
 class GameName:
     font = pygame.font.SysFont('Times New Roman', 50)
-
-    def __init__(self, username):
-        self.text_surf = self.font.render(username, True, 'black')
     
-    def draw(self, surf):
-        surf.blit(self.text_surf, (300, 300))
+    @classmethod
+    def draw(cls, surf, username, *args):       
+        text_surf = cls.font.render(str(username), True, 'black')
+        surf.blit(text_surf, (300, 300))
         
 
 class Intro(pygame.sprite.Sprite):
@@ -216,21 +215,21 @@ class StageManager():
         usernameLabel = Label(self.tkwindow, text="Enter a username:").grid(row=0, column=0)
         username = StringVar()
         usernameEntry = Entry(self.tkwindow, textvariable=username).grid(row=0, column=1)  
-        GameName.gamename = partial(GameName.gamename, username)                                                                                                                            
+        GameName.draw = partial(GameName.draw, username)                                                                                                                            
         
-        all_commands = lambda:[GameName.gamename(username), StageManager.scene_2(self)]
-        btn1 = Button(self.tkwindow, text="Are you ready to start?", fg="blue", command = all_commands)  #command basically triggar def scene:1(): när man klickar på knappen
+      
+        btn1 = Button(self.tkwindow, text="Are you ready to start?", fg="blue", command = self.scene_2)  #command basically triggar def scene:1(): när man klickar på knappen
         btn1.place(x=80, y=150)
         self.tkwindow.mainloop()
         return username.get()                     
                    
-    
+
 
     def scene_0(self):
         intro.introbg()
         intro.logoimg() 
         intro.presstocontinue()
-        gn.draw()
+        GameName().draw()
         bg.hide = True
         gnd.hide = True  
         knight.hide = True 
@@ -262,10 +261,6 @@ class StageManager():
         knight.hide = True
 
 class SceneOne(pygame.sprite.Sprite):
-    def __init__(self):
-        self.hide = False
-        super().__init__()
-
     def sceneonebg(self):
         if self.hide == False:
             screen.blit(scene_1_img, (0, 0))
@@ -284,8 +279,7 @@ class SceneOne(pygame.sprite.Sprite):
 #bryter most standard(?)
 bg = Background()
 gnd = GroundLevel()  
-pnl = Panel()     
-gn = GameName()    
+pnl = Panel()       
 knight = Knight()
 mgr = StageManager()
 intro = Intro()
@@ -314,13 +308,13 @@ if __name__ == "__main__":
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    mgr.stage_fixer2()
+                    usrname = mgr.stage_fixer2()
                     s1.sceneonebg()
                     pnl.drawpanel()
                     s1.oldwiz()
                     s1.paragraph()
-                    gn.draw(screen)
-                    GameName.gamename("test")               
+                    GameName.draw(screen, usrname)
+                         
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN and mgr.SHOWTK == True: 
                     keyboard.block_key("return")       
